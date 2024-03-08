@@ -1,17 +1,14 @@
 package org.anyone.backend.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.anyone.backend.model.User;
+import org.anyone.backend.model.Users;
 import org.anyone.backend.repository.UserRepository;
 import org.anyone.backend.service.UserDetailsService;
 import org.anyone.backend.util.JwtUtil;
 import org.anyone.backend.util.ResponseData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,15 +35,15 @@ public class LoginController {
         String username = requestBody.get("username").asText();
         String rawPassword = requestBody.get("password").asText();
         try {
-            Optional<User> userOptional = userRepository.findUserByUsername(username);
+            Optional<Users> userOptional = userRepository.findUserByUsername(username);
             if (userOptional.isEmpty()) {
                 throw new UsernameNotFoundException("User " + username + " NOT FOUND");
             }
 
-            User user = userOptional.get();
+            Users users = userOptional.get();
 
             logger.info(passwordEncoder.encode(rawPassword));
-            if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+            if (!passwordEncoder.matches(rawPassword, users.getPassword())) {
                 logger.info(passwordEncoder.encode(rawPassword));
                 throw new Exception("Password incorrect");
             }
@@ -55,7 +52,7 @@ public class LoginController {
             logger.info("Login success");
             return ResponseEntity.status(200)
                     .header("Authorization", "Bearer " + token)
-                    .body(new ResponseData<>(200, "login success", user));
+                    .body(new ResponseData<>(200, "login success", users));
         } catch (Exception e) {
             logger.info("Login failed");
             return ResponseEntity.status(401)

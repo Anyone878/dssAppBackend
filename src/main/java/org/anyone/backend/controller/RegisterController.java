@@ -1,7 +1,7 @@
 package org.anyone.backend.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.anyone.backend.model.User;
+import org.anyone.backend.model.Users;
 import org.anyone.backend.repository.UserRepository;
 import org.anyone.backend.util.ResponseData;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,14 +40,14 @@ public class RegisterController {
             return new ResponseData<>(400, "field invalid", null);
         }
 
-        Optional<User> userOptional = userRepository.findUserByUsername(username);
+        Optional<Users> userOptional = userRepository.findUserByUsername(username);
         if (userOptional.isPresent()) {
             // username is being used.
             return new ResponseData<>(409, "username is being used", null);
         }
 
-        User user = new User(username, passwordEncoder.encode(rawPassword), email, phoneNumber, fullName);
-        User savedUser = userRepository.save(user);
-        return new ResponseData<>(200, "user created", savedUser);
+        Users users = new Users(username, passwordEncoder.encode(rawPassword), email, phoneNumber, fullName);
+        Users savedUsers = userRepository.save(users);
+        return new ResponseData<>(200, "user created", savedUsers);
     }
 }

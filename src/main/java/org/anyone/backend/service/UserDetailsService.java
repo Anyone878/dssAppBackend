@@ -1,13 +1,12 @@
 package org.anyone.backend.service;
 
-import org.anyone.backend.model.User;
+import org.anyone.backend.model.Users;
 import org.anyone.backend.repository.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +23,7 @@ public class UserDetailsService implements org.springframework.security.core.use
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findUserByUsername(username);
+        Optional<Users> user = userRepository.findUserByUsername(username);
         if (user.isEmpty()) {
             throw new UsernameNotFoundException("User " + username + " NOT FOUND");
         }

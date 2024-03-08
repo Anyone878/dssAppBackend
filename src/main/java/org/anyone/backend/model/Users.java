@@ -1,27 +1,33 @@
 package org.anyone.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
-public class User {
+public class Users {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "UserID")
+    @GeneratedValue(strategy = GenerationType.TABLE)
     private Integer userID;
 
+    @Column(name = "Username")
     private String username;
 
     @JsonIgnore
+    @Column(name = "Password")
     private String password;
+
+    @Column(name = "EmailAddress")
     private String emailAddress;
+
+    @Column(name = "PhoneNumber")
     private String phoneNumber;
+
+    @Column(name = "FullName")
     private String fullName;
 
-    public User(String username, String password, String emailAddress, String phoneNumber, String fullName) {
+    public Users(String username, String password, String emailAddress, String phoneNumber, String fullName) {
         this.username = username;
         this.password = password;
         this.emailAddress = emailAddress;
@@ -29,7 +35,7 @@ public class User {
         this.fullName = fullName;
     }
 
-    protected User() {
+    protected Users() {
 
     }
 

@@ -1,7 +1,7 @@
 package org.anyone.backend.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.anyone.backend.model.User;
+import org.anyone.backend.model.Users;
 import org.anyone.backend.repository.UserRepository;
 import org.anyone.backend.util.ResponseData;
 import org.slf4j.Logger;
@@ -30,10 +30,10 @@ public class UserController {
         if (userID == 0) {
             return new ResponseData<>(400, "bad request body", null);
         }
-        Optional<User> userOptional = userRepository.findById(userID);
+        Optional<Users> userOptional = userRepository.findById(userID);
         if (userOptional.isEmpty()) {
             return new ResponseData<>(404, "user not found", null);
         }
-        return new ResponseData<User>(200, "user found", userOptional.get());
+        return new ResponseData<Users>(200, "user found", userOptional.get());
     }
 }
