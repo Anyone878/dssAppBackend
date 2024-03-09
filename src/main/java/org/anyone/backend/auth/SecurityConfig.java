@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
-                                .requestMatchers("/login", "/register", "/unsafe_api_test").permitAll()
+                                .requestMatchers("/login", "/register", "/").permitAll()
                                 .anyRequest().hasAuthority(UserDetailsService.ROLE_USER)
 
                 )
@@ -55,6 +55,6 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring().requestMatchers("/login", "/register", "/unsafe_api_test");
+        return web -> web.ignoring().requestMatchers("/login", "/register", "/");
     }
 }
