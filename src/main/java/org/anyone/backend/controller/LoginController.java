@@ -25,6 +25,32 @@ public class LoginController {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
+    public static class LoginResponseBody {
+        private String token;
+        private Users user;
+
+        public LoginResponseBody(String token, Users user) {
+            this.token = token;
+            this.user = user;
+        }
+
+        public String getToken() {
+            return token;
+        }
+
+        public void setToken(String token) {
+            this.token = token;
+        }
+
+        public Users getUser() {
+            return user;
+        }
+
+        public void setUser(Users user) {
+            this.user = user;
+        }
+    }
+
     public LoginController(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder, UserRepository userRepository) {
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
@@ -50,9 +76,9 @@ public class LoginController {
 
             String token = JwtUtil.generate(username);
             logger.info("Login success");
+            LoginResponseBody body = new LoginResponseBody(token, users);
             return ResponseEntity.status(200)
-                    .header("Authorization", "Bearer " + token)
-                    .body(new ResponseData<>(200, "login success", users));
+                    .body(new ResponseData<>(200, "login success", body));
         } catch (Exception e) {
             logger.info("Login failed");
             return ResponseEntity.status(401)
