@@ -3,6 +3,8 @@ package org.anyone.backend.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 public class Users {
 
@@ -37,6 +39,19 @@ public class Users {
 
     protected Users() {
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Users users = (Users) o;
+        return Objects.equals(userID, users.userID);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userID);
     }
 
     public Integer getUserID() {
