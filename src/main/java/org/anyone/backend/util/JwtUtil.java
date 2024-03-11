@@ -14,7 +14,7 @@ import java.util.Date;
 public final class JwtUtil {
 //    private final static Password key = Keys.password("@shabidss".toCharArray());
     private final static SecretKey key = Jwts.SIG.HS512.key().build(); //or HS384.key() or HS512.key()
-    private final static Duration expiration = Duration.ofMinutes(15);
+    private final static Duration expiration = Duration.ofDays(30);
     private final static Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
     public static String generate(String username) {
