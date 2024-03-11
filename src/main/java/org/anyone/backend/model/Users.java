@@ -29,6 +29,9 @@ public class Users {
     @Column(name = "FullName")
     private String fullName;
 
+    @Column(name = "AvatarURL")
+    private String avatarURL;
+
     public Users(String username, String password, String emailAddress, String phoneNumber, String fullName) {
         this.username = username;
         this.password = password;
@@ -96,6 +99,14 @@ public class Users {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public String getAvatarURL() {
+        return avatarURL;
+    }
+
+    public void setAvatarURL(String avatarURL) {
+        this.avatarURL = avatarURL;
     }
 
     @Override
