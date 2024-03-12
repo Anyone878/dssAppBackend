@@ -12,7 +12,7 @@ public class Location {
     @GeneratedValue(strategy = GenerationType.TABLE)
     int recordID;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "PetID", referencedColumnName = "PetID")
     Pet pet;
 

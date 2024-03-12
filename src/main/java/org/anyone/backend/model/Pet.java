@@ -12,12 +12,12 @@ public class Pet {
     @GeneratedValue(strategy = GenerationType.TABLE)
     int petID;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "UserID", referencedColumnName = "UserID")
     @JsonIgnore
     Users user;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "FeederID", referencedColumnName = "FeederID")
     @JsonIgnore
     Feeder feeder;

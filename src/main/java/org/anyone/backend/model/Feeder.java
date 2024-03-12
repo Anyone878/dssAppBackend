@@ -12,7 +12,7 @@ public class Feeder {
     @Column(name = "FeederID")
     int feederID;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "UserID", referencedColumnName = "UserID")
     @JsonIgnore
     Users user;
