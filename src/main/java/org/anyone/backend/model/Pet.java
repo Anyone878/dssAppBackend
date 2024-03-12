@@ -31,6 +31,30 @@ public class Pet {
     @Column(name = "AvatarURL")
     String avatarURL;
 
+    public Pet() {
+    }
+
+    public Pet(int petID, Users user, Feeder feeder, String petName, String gender, String avatarURL) {
+        this.petID = petID;
+        this.user = user;
+        this.feeder = feeder;
+        this.petName = petName;
+        this.gender = gender;
+        this.avatarURL = avatarURL;
+    }
+
+    @Override
+    public String toString() {
+        return "Pet{" +
+                "petID=" + petID +
+                ", user=" + user +
+                ", feeder=" + feeder +
+                ", petName='" + petName + '\'' +
+                ", gender='" + gender + '\'' +
+                ", avatarURL='" + avatarURL + '\'' +
+                '}';
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

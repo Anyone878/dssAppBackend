@@ -33,6 +33,16 @@ public class WeightRecords {
     }
 
     @Override
+    public String toString() {
+        return "WeightRecords{" +
+                "RecordID=" + RecordID +
+                ", pet=" + pet +
+                ", weight=" + weight +
+                ", recordDateTime=" + recordDateTime +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

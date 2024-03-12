@@ -27,6 +27,28 @@ public class Location {
     @Column(name = "RecordDateTime")
     LocalDateTime recordDateTime;
 
+    public Location() {
+    }
+
+    public Location(int recordID, Pet pet, String lng, String lat, LocalDateTime recordDateTime) {
+        this.recordID = recordID;
+        this.pet = pet;
+        this.lng = lng;
+        Lat = lat;
+        this.recordDateTime = recordDateTime;
+    }
+
+    @Override
+    public String toString() {
+        return "Location{" +
+                "recordID=" + recordID +
+                ", pet=" + pet +
+                ", lng='" + lng + '\'' +
+                ", Lat='" + Lat + '\'' +
+                ", recordDateTime=" + recordDateTime +
+                '}';
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

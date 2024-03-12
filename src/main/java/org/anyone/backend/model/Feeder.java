@@ -23,6 +23,26 @@ public class Feeder {
     @Column(name = "WaterCapacity")
     float waterCapacity;
 
+    public Feeder() {
+    }
+
+    public Feeder(int feederID, Users user, float foodCapacity, float waterCapacity) {
+        this.feederID = feederID;
+        this.user = user;
+        this.foodCapacity = foodCapacity;
+        this.waterCapacity = waterCapacity;
+    }
+
+    @Override
+    public String toString() {
+        return "Feeder{" +
+                "feederID=" + feederID +
+                ", user=" + user +
+                ", foodCapacity=" + foodCapacity +
+                ", waterCapacity=" + waterCapacity +
+                '}';
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
