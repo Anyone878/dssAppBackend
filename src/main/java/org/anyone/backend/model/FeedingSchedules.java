@@ -1,5 +1,6 @@
 package org.anyone.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.sql.Time;
@@ -13,10 +14,12 @@ public class FeedingSchedules {
 
     @ManyToOne
     @JoinColumn(name = "PetID", referencedColumnName = "PetID")
+    @JsonIgnore
     Pet pet;
 
     @ManyToOne
     @JoinColumn(name = "FeederID", referencedColumnName = "FeederID")
+    @JsonIgnore
     Feeder feeder;
 
     @Column(name = "FeedingTime")

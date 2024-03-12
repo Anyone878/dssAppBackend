@@ -1,5 +1,6 @@
 package org.anyone.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ public class Location {
 
     @ManyToOne
     @JoinColumn(name = "PetID", referencedColumnName = "PetID")
+    @JsonIgnore
     Pet pet;
 
     @Column(name = "Lng")
