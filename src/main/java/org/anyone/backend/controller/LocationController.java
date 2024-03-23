@@ -52,7 +52,7 @@ public class LocationController {
 
         Optional<Pet> optionalPet = petRepository.findByUser(user);
         if (optionalPet.isEmpty()) {
-            return new ResponseData<>(401, "pet not found", null);
+            return new ResponseData<>(404, "pet not found", null);
         }
         Pet pet = optionalPet.get();
 
@@ -102,7 +102,7 @@ public class LocationController {
         Users user = optionalUsers.get();
         Optional<Pet> optionalPet = petRepository.findByUser(user);
         if (optionalPet.isEmpty()) {
-            return new ResponseData<>(401, "pet not found", null);
+            return new ResponseData<>(404, "pet not found", null);
         }
         Pet pet = optionalPet.get();
 

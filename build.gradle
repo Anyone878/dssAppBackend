@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'org.anyone'
-version = '0.3.0-prod'
+version = '0.3.1-prod'
 
 java {
     sourceCompatibility = '17'
