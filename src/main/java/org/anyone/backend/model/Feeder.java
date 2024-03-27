@@ -23,14 +23,18 @@ public class Feeder {
     @Column(name = "WaterCapacity")
     float waterCapacity;
 
+    @Column(name = "EverydayFoodPlan")
+    float everydayFoodPlan;
+
     public Feeder() {
     }
 
-    public Feeder(int feederID, Users user, float foodCapacity, float waterCapacity) {
+    public Feeder(int feederID, Users user, float foodCapacity, float waterCapacity, float everydayFoodPlan) {
         this.feederID = feederID;
         this.user = user;
         this.foodCapacity = foodCapacity;
         this.waterCapacity = waterCapacity;
+        this.everydayFoodPlan = everydayFoodPlan;
     }
 
     @Override
@@ -40,6 +44,7 @@ public class Feeder {
                 ", user=" + user +
                 ", foodCapacity=" + foodCapacity +
                 ", waterCapacity=" + waterCapacity +
+                ", everydayFoodPlan=" + everydayFoodPlan +
                 '}';
     }
 
@@ -54,6 +59,14 @@ public class Feeder {
     @Override
     public int hashCode() {
         return Objects.hash(feederID);
+    }
+
+    public float getEverydayFoodPlan() {
+        return everydayFoodPlan;
+    }
+
+    public void setEverydayFoodPlan(float everydayFoodPlan) {
+        this.everydayFoodPlan = everydayFoodPlan;
     }
 
     public int getFeederID() {
