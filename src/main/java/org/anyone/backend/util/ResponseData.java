@@ -11,6 +11,24 @@ public class ResponseData<T> {
         this.data = data;
     }
 
+    public ResponseData(Integer code, String msg) {
+        this.code = code;
+        this.msg = msg;
+        this.data = null;
+    }
+
+    public static ResponseData<?> badRequestBodyResponse() {
+        return new ResponseData<>(400, "bad request body");
+    }
+
+    public static ResponseData<?> serverFailureResponse() {
+        return new ResponseData<>(500, "server failure");
+    }
+
+    public static ResponseData<?> userNotFoundResponse() {
+        return new ResponseData<>(401, "user not found");
+    }
+
     public Integer getCode() {
         return code;
     }

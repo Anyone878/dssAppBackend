@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.Objects;
 
 @Entity
@@ -12,6 +13,11 @@ public class FeedingSchedules {
     @Column(name = "FeedingID")
     @GeneratedValue(strategy = GenerationType.TABLE)
     int feedingID;
+
+    @ManyToOne
+    @JoinColumn(name = "UserID", referencedColumnName = "UserID")
+    @JsonIgnore
+    Users user;
 
     @ManyToOne
     @JoinColumn(name = "PetID", referencedColumnName = "PetID")
@@ -24,7 +30,7 @@ public class FeedingSchedules {
     Feeder feeder;
 
     @Column(name = "FeedingTime")
-    Time feedingTime;
+    LocalTime feedingTime;
 
     @Column(name = "FoodAmount")
     float foodAmount;
@@ -32,7 +38,7 @@ public class FeedingSchedules {
     public FeedingSchedules() {
     }
 
-    public FeedingSchedules(int feedingID, Pet pet, Feeder feeder, Time feedingTime, float foodAmount) {
+    public FeedingSchedules(int feedingID, Pet pet, Feeder feeder, LocalTime feedingTime, float foodAmount) {
         this.feedingID = feedingID;
         this.pet = pet;
         this.feeder = feeder;
@@ -64,6 +70,14 @@ public class FeedingSchedules {
         return Objects.hash(feedingID);
     }
 
+    public Users getUser() {
+        return user;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
+    }
+
     public int getFeedingID() {
         return feedingID;
     }
@@ -88,11 +102,11 @@ public class FeedingSchedules {
         this.feeder = feeder;
     }
 
-    public Time getFeedingTime() {
+    public LocalTime getFeedingTime() {
         return feedingTime;
     }
 
-    public void setFeedingTime(Time feedingTime) {
+    public void setFeedingTime(LocalTime feedingTime) {
         this.feedingTime = feedingTime;
     }
 
