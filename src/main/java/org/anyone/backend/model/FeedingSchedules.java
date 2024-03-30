@@ -46,6 +46,13 @@ public class FeedingSchedules {
         this.foodAmount = foodAmount;
     }
 
+    public FeedingSchedules(Users user, Pet pet, Feeder feeder, LocalTime feedingTime) {
+        this.user = user;
+        this.pet = pet;
+        this.feeder = feeder;
+        this.feedingTime = feedingTime;
+    }
+
     @Override
     public String toString() {
         return "FeedingSchedules{" +

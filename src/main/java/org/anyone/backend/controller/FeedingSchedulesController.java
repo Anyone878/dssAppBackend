@@ -1,7 +1,6 @@
 package org.anyone.backend.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.anyone.backend.model.Feeder;
 import org.anyone.backend.model.FeedingSchedules;
 import org.anyone.backend.model.Pet;
@@ -21,7 +20,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,13 +43,10 @@ public class FeedingSchedulesController {
     @GetMapping
     ResponseData<?> getFeedingSchedules(
             @CurrentSecurityContext(expression = "authentication.principal") UserDetails userDetails) {
-        Optional<Users> optionalUsers = userRepository.findUserByUsername(userDetails.getUsername());
-        if (optionalUsers.isEmpty()) {
-            return ResponseData.userNotFoundResponse();
-        }
-        Users users = optionalUsers.get();
+        Users user = getUser(userDetails);
+        if (user == null) return ResponseData.userNotFoundResponse();
 
-        Iterable<FeedingSchedules> feedingSchedulesIterable = feedingSchedulesRepository.findAllByUser(users);
+        Iterable<FeedingSchedules> feedingSchedulesIterable = feedingSchedulesRepository.findAllByUser(user);
         List<FeedingSchedules> feedingSchedulesList = new ArrayList<>();
         feedingSchedulesIterable.forEach(feedingSchedulesList::add);
         return new ResponseData<>(200, "feeding schedules found", feedingSchedulesList);
@@ -102,63 +97,55 @@ public class FeedingSchedulesController {
      * ["LocalDateTime in ISO-8601", ...]
      */
     @PostMapping
-    ResponseData<?> addFeedingSchedules(
+    ResponseData<?> deleteAndAddFeedingSchedules(
             @CurrentSecurityContext(expression = "authentication.principal") UserDetails userDetails,
             @RequestBody JsonNode jsonNode
     ) {
-        // getting user data
-        Optional<Users> optionalUsers = userRepository.findUserByUsername(userDetails.getUsername());
-        if (optionalUsers.isEmpty()) {
-            return new ResponseData<>(401, "user not found");
-        }
-        Users user = optionalUsers.get();
-        // getting pet data
-        Optional<Pet> optionalPet = petRepository.findByUser(user);
-        if (optionalPet.isEmpty()) {
-            return new ResponseData<>(404, "pet not found");
-        }
-        Pet pet = optionalPet.get();
-        // getting feeder data
-        Optional<Feeder> optionalFeeder = feederRepository.findByUser(user);
-        if (optionalFeeder.isEmpty()) {
-            return new ResponseData<>(404, "feeder not found");
-        }
-        Feeder feeder = optionalFeeder.get();
+        try {
+            Users user = getUser(userDetails);
+            if (user == null) return ResponseData.userNotFoundResponse();
+            Pet pet = getPet(user);
+            if (pet == null) return new ResponseData<>(404, "pet not found");
+            // getting feeder data
+            Optional<Feeder> optionalFeeder = feederRepository.findByUser(user);
+            if (optionalFeeder.isEmpty()) {
+                return new ResponseData<>(404, "feeder not found");
+            }
+            Feeder feeder = optionalFeeder.get();
 
-        logger.info(jsonNode.toString());
-        if (!jsonNode.has("feedingSchedules")) {
-            logger.error(jsonNode.toString());
+            logger.info(jsonNode.toString());
+            if (!jsonNode.has("feedingSchedules")) {
+                logger.error(jsonNode.toString());
+                return ResponseData.badRequestBodyResponse();
+            }
+            if (!jsonNode.get("feedingSchedules").isArray()) {
+                logger.error(jsonNode.toString());
+                return new ResponseData<>(400, "bad request body, 'feedingSchedules' is not an array");
+            }
+            // validate all schedule data.
+            for (JsonNode node : jsonNode.get("feedingSchedules")) {
+                try {
+                    LocalDateTime dateTime = LocalDateTime.parse(node.asText());
+                } catch (DateTimeParseException e) {
+                    logger.error(e.getParsedString());
+                    return ResponseData.badRequestBodyResponse();
+                }
+            }
+            // delete all schedules.
+            feedingSchedulesRepository.deleteAllByUser(user);
+            // processing...
+            for (JsonNode node : jsonNode.get("feedingSchedules")) {
+                LocalTime time = LocalDateTime.parse(node.asText()).toLocalTime();
+                feedingSchedulesRepository.save(new FeedingSchedules(user, pet, feeder, time));
+            }
+            return getFeedingSchedules(userDetails);
+        } catch (DateTimeParseException e) {
+            logger.error(e.getParsedString());
             return ResponseData.badRequestBodyResponse();
+        } catch (Exception e) {
+            logger.error(e.toString());
+            return ResponseData.serverFailureResponse();
         }
-        if (!jsonNode.get("feedingSchedules").isArray()) {
-            logger.error(jsonNode.toString());
-            return new ResponseData<>(400, "bad request body, 'feedingSchedules' is not an array");
-        }
-        Iterator<JsonNode> feedingSchedulesArrayNodes = jsonNode.withArray("feedingSchedules").elements();
-        while (feedingSchedulesArrayNodes.hasNext()) {
-            JsonNode jsonNode1 = feedingSchedulesArrayNodes.next();
-            if (!jsonNode1.isTextual()) {
-                logger.error("node is not a text");
-                return ResponseData.badRequestBodyResponse();
-            }
-            try {
-                LocalDateTime feedingDateTime = LocalDateTime.parse(jsonNode1.asText());
-                LocalTime feedingTime = feedingDateTime.toLocalTime();
-                FeedingSchedules feedingSchedules = new FeedingSchedules();
-                feedingSchedules.setFeedingTime(feedingTime);
-                feedingSchedules.setFeeder(feeder);
-                feedingSchedules.setPet(pet);
-                feedingSchedules.setUser(user);
-                feedingSchedulesRepository.save(feedingSchedules);
-            } catch (DateTimeParseException e) {
-                logger.error(e.getParsedString());
-                return ResponseData.badRequestBodyResponse();
-            } catch (Exception e) {
-                logger.error(e.toString());
-                return ResponseData.serverFailureResponse();
-            }
-        }
-        return new ResponseData<>(200, "feeding schedules set");
     }
 
     /**
@@ -189,5 +176,15 @@ public class FeedingSchedulesController {
             logger.error(e.toString());
             return ResponseData.serverFailureResponse();
         }
+    }
+
+    private Users getUser(UserDetails userDetails) {
+        Optional<Users> optionalUsers = userRepository.findUserByUsername(userDetails.getUsername());
+        return optionalUsers.orElse(null);
+    }
+
+    private Pet getPet(Users user) {
+        Optional<Pet> optionalPet = petRepository.findByUser(user);
+        return optionalPet.orElse(null);
     }
 }
