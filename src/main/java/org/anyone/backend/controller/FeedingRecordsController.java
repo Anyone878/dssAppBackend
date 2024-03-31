@@ -35,13 +35,14 @@ public class FeedingRecordsController {
         this.petRepository = petRepository;
     }
 
-    record GrabFeedingRecords(@JsonIgnore Pet pet, LocalDate feedingDate, float foodAmount) {
+    record GrabFeedingRecords(@JsonIgnore Pet pet, LocalDate feedingDate, float foodAmount, short feedingTimes) {
         @Override
         public String toString() {
             return "GrabFeedingRecords{" +
                     "pet=" + pet +
                     ", date=" + feedingDate +
                     ", amount=" + foodAmount +
+                    ", feeding times=" + feedingTimes +
                     '}';
         }
     }
@@ -109,10 +110,10 @@ public class FeedingRecordsController {
     /**
      * NOTE: Time sensitive.
      */
-    @GetMapping(path = {"/daily"}, params = {"start"})
+    @GetMapping(path = {"/daily"})
     ResponseData<?> getDaily(
             @CurrentSecurityContext(expression = "authentication.principal") UserDetails userDetails,
-            @RequestParam(name = "start") String start,
+            @RequestParam(name = "start", required = false, defaultValue = "2000-01-01T01:00:00") String start,
             @RequestParam(name = "end", required = false, defaultValue = "null") String end
     ) {
         try {
@@ -126,16 +127,19 @@ public class FeedingRecordsController {
             Iterable<FeedingRecords> feedingRecordsIterable = endDT == null ?
                     feedingRecordsRepository.findAllByPetAndFeedingDateTimeAfterOrderByFeedingDateTimeDesc(pet, startDT) :
                     feedingRecordsRepository.findAllByPetAndFeedingDateTimeBetweenOrderByFeedingDateTimeDesc(pet, startDT, endDT);
-            HashMap<LocalDate, Float> map = new HashMap<>();
+            HashMap<LocalDate, float[]> map = new HashMap<>();
             feedingRecordsIterable.forEach(feedingRecords -> {
                 LocalDate k = feedingRecords.getFeedingDateTime().toLocalDate();
-                Float v = map.get(k);
-                map.put(k, v == null ? feedingRecords.getFoodAmount() : v + feedingRecords.getFoodAmount());
+                if (!map.containsKey(k)) {
+                    map.put(k, new float[]{feedingRecords.getFoodAmount(), 1.0F});
+                } else {
+                    float[] v = map.get(k);
+                    v[0] += feedingRecords.getFoodAmount();
+                    v[1] += 1;
+                }
             });
             List<GrabFeedingRecords> grabFeedingRecords = new ArrayList<>();
-            map.forEach((k, v) -> {
-                grabFeedingRecords.add(new GrabFeedingRecords(pet, k, v));
-            });
+            map.forEach((k, v) -> grabFeedingRecords.add(new GrabFeedingRecords(pet, k, v[0], (short) v[1])));
             return new ResponseData<>(200, "aggregated feeding records found", grabFeedingRecords);
         } catch (DateTimeParseException e) {
             logger.error(e.getParsedString());
