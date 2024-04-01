@@ -19,4 +19,9 @@ public class UserService {
         Optional<Users> optionalUsers = userRepository.findUserByUsername(userDetails.getUsername());
         return optionalUsers.orElse(null);
     }
+
+    public Users getUser(int userID) {
+        Optional<Users> optionalUsers = userRepository.findByUserID(userID);
+        return optionalUsers.orElse(null);
+    }
 }

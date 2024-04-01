@@ -2,7 +2,10 @@ package org.anyone.backend.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.anyone.backend.model.Users;
+import org.anyone.backend.repository.PostsRepository;
 import org.anyone.backend.repository.UserRepository;
+import org.anyone.backend.service.PostsService;
+import org.anyone.backend.service.UserService;
 import org.anyone.backend.util.ResponseData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +25,13 @@ public class UserController {
     private final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     private final UserRepository userRepository;
+    private final PostsService postsService;
+    private final UserService userService;
 
-    public UserController(UserRepository userRepository) {
+    public UserController(UserRepository userRepository, PostsService postsService, UserService userService) {
         this.userRepository = userRepository;
+        this.postsService = postsService;
+        this.userService = userService;
     }
 
     @GetMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -49,5 +56,14 @@ public class UserController {
             return new ResponseData<>(404, "user not found in get (2)", null);
         }
         return new ResponseData<>(200, "user found", usersOptional.get());
+    }
+
+    @GetMapping("/posts")
+    ResponseData<?> getAllPosts(
+            @CurrentSecurityContext(expression = "authentication.principal")UserDetails userDetails
+    ) {
+        Users user = userService.getUser(userDetails);
+        if (user == null) return ResponseData.userNotFoundResponse();
+        return new ResponseData<>(200, "posts found", postsService.getPosts(user));
     }
 }
