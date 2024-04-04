@@ -2,7 +2,6 @@ package org.anyone.backend.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.anyone.backend.model.Users;
-import org.anyone.backend.repository.PostsRepository;
 import org.anyone.backend.repository.UserRepository;
 import org.anyone.backend.service.PostsService;
 import org.anyone.backend.service.UserService;
@@ -64,6 +63,6 @@ public class UserController {
     ) {
         Users user = userService.getUser(userDetails);
         if (user == null) return ResponseData.userNotFoundResponse();
-        return new ResponseData<>(200, "posts found", postsService.getPosts(user));
+        return new ResponseData<>(200, "posts found", postsService.getPostDTOList(user));
     }
 }

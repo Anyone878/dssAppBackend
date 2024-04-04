@@ -40,6 +40,12 @@ public class Posts {
     @JsonSerialize(using = AtAndTagSerializer.class)
     String tags;
 
+    @Column(name = "Likes")
+    int likes;
+
+    @Column(name = "Comments")
+    int comments;
+
     static class AtAndTagSerializer extends JsonSerializer<String> {
         @Override
         public void serialize(String value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
@@ -71,6 +77,22 @@ public class Posts {
                 ", ats='" + ats + '\'' +
                 ", tags='" + tags + '\'' +
                 '}';
+    }
+
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
+
+    public int getComments() {
+        return comments;
+    }
+
+    public void setComments(int comments) {
+        this.comments = comments;
     }
 
     public int getPostID() {
