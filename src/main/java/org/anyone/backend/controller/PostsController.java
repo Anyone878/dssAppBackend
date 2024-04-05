@@ -1,11 +1,12 @@
 package org.anyone.backend.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.anyone.backend.dto.response.CommentDTO;
 import org.anyone.backend.dto.response.PostDTO;
 import org.anyone.backend.model.Likes;
-import org.anyone.backend.model.Posts;
 import org.anyone.backend.model.Users;
 import org.anyone.backend.service.LikesService;
+import org.anyone.backend.service.PostCommentsService;
 import org.anyone.backend.service.PostsService;
 import org.anyone.backend.service.UserService;
 import org.anyone.backend.util.ResponseData;
@@ -25,11 +26,13 @@ public class PostsController {
     private final UserService userService;
     private final Logger logger = LoggerFactory.getLogger(PostsController.class);
     private final LikesService likesService;
+    private final PostCommentsService postCommentsService;
 
-    public PostsController(PostsService postsService, UserService userService, LikesService likesService) {
+    public PostsController(PostsService postsService, UserService userService, LikesService likesService, PostCommentsService postCommentsService) {
         this.postsService = postsService;
         this.userService = userService;
         this.likesService = likesService;
+        this.postCommentsService = postCommentsService;
     }
 
     @GetMapping

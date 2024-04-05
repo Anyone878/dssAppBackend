@@ -32,12 +32,6 @@ public class PostComments {
     @Column(name = "Likes")
     int likes;
 
-    /**
-     * if the current user likes this comment?
-     */
-    @Transient
-    boolean isSelfLiked;
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -60,7 +54,6 @@ public class PostComments {
                 ", commentContent='" + commentContent + '\'' +
                 ", commentDateTime=" + commentDateTime +
                 ", likes=" + likes +
-                ", isSelfLiked=" + isSelfLiked +
                 '}';
     }
 
@@ -110,13 +103,5 @@ public class PostComments {
 
     public void setLikes(int likes) {
         this.likes = likes;
-    }
-
-    public boolean isSelfLiked() {
-        return isSelfLiked;
-    }
-
-    public void setSelfLiked(boolean selfLiked) {
-        isSelfLiked = selfLiked;
     }
 }
