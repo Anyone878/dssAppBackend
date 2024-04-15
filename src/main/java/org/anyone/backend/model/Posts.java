@@ -22,7 +22,6 @@ public class Posts {
 
     @ManyToOne
     @JoinColumn(name = "UserID", referencedColumnName = "UserID")
-    @JsonIgnore
     Users user;
 
     @Column(name = "PostContent")
