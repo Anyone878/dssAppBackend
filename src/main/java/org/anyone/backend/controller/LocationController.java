@@ -13,10 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
@@ -38,10 +35,11 @@ public class LocationController {
         this.petRepository = petRepository;
     }
 
-    @GetMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(params = {"start"})
     public ResponseData<?> getLocations(
             @CurrentSecurityContext(expression = "authentication.principal") UserDetails userDetails,
-            @RequestBody JsonNode jsonNode
+            @RequestParam(name = "start")String start,
+            @RequestParam(name = "end", required = false, defaultValue = "null")String end
     ) {
         String username = userDetails.getUsername();
         Optional<Users> optionalUsers = userRepository.findUserByUsername(username);
@@ -57,26 +55,18 @@ public class LocationController {
         Pet pet = optionalPet.get();
 
         // parse in ISO 8601, so check data validation first
-        JsonNode startNode = jsonNode.get("start");
-        JsonNode endNode = jsonNode.get("end");
-        if (startNode == null) {
-            return new ResponseData<>(400, "bad request body", null);
-        }
-
-        String start = startNode.asText();
-        if (start.isEmpty()) {
+        if (start.equals("null")) {
             return new ResponseData<>(400, "bed request body", null);
         }
         try {
             LocalDateTime startDateTime = LocalDateTime.parse(start);
-            if (endNode == null || endNode.asText().isEmpty()) {
+            if (end.equals("null")) {
                 Iterable<Location> locationIterable =
                         locationRepository.findAllByPetAndRecordDateTimeAfterOrderByRecordDateTime(pet, startDateTime);
                 List<Location> locations = new ArrayList<>();
                 locationIterable.forEach(locations::add);
                 return new ResponseData<>(200, "locations found", locations);
             } else {
-                String end = endNode.asText();
                 LocalDateTime endDateTime = LocalDateTime.parse(end);
                 Iterable<Location> locationIterable =
                         locationRepository.findAllByPetAndRecordDateTimeBetweenOrderByRecordDateTime(pet, startDateTime, endDateTime);
