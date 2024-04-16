@@ -9,6 +9,7 @@ import org.anyone.backend.repository.FeederRepository;
 import org.anyone.backend.repository.FeedingSchedulesRepository;
 import org.anyone.backend.repository.PetRepository;
 import org.anyone.backend.repository.UserRepository;
+import org.anyone.backend.service.FeedingSchedulesService;
 import org.anyone.backend.util.ResponseData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,14 +31,16 @@ public class FeedingSchedulesController {
     private final FeedingSchedulesRepository feedingSchedulesRepository;
     private final PetRepository petRepository;
     private final FeederRepository feederRepository;
+    private final FeedingSchedulesService feedingSchedulesService;
     private final Logger logger = LoggerFactory.getLogger(FeedingSchedules.class);
 
 
-    public FeedingSchedulesController(UserRepository userRepository, FeedingSchedulesRepository feedingSchedulesRepository, PetRepository petRepository, FeederRepository feederRepository) {
+    public FeedingSchedulesController(UserRepository userRepository, FeedingSchedulesRepository feedingSchedulesRepository, PetRepository petRepository, FeederRepository feederRepository, FeedingSchedulesService feedingSchedulesService) {
         this.userRepository = userRepository;
         this.feedingSchedulesRepository = feedingSchedulesRepository;
         this.petRepository = petRepository;
         this.feederRepository = feederRepository;
+        this.feedingSchedulesService = feedingSchedulesService;
     }
 
     @GetMapping
@@ -82,6 +85,8 @@ public class FeedingSchedulesController {
             FeedingSchedules feedingSchedules = feedingSchedulesOptional.get();
             feedingSchedules.setFeedingTime(feedingTime.toLocalTime());
             feedingSchedulesRepository.save(feedingSchedules);
+            // update feeding amount
+            feedingSchedulesService.updateAmount(user);
             return new ResponseData<>(200, "data updated", feedingSchedules);
         } catch (DateTimeParseException dateTimeParseException) {
             logger.error(dateTimeParseException.getParsedString());
@@ -138,6 +143,8 @@ public class FeedingSchedulesController {
                 LocalTime time = LocalDateTime.parse(node.asText()).toLocalTime();
                 feedingSchedulesRepository.save(new FeedingSchedules(user, pet, feeder, time));
             }
+            // update feeding amount
+            feedingSchedulesService.updateAmount(user);
             return getFeedingSchedules(userDetails);
         } catch (DateTimeParseException e) {
             logger.error(e.getParsedString());
@@ -157,6 +164,8 @@ public class FeedingSchedulesController {
             @CurrentSecurityContext(expression = "authentication.principal") UserDetails userDetails,
             @RequestBody JsonNode requestBody
     ) {
+        Users user = getUser(userDetails);
+        if (user == null) return ResponseData.userNotFoundResponse();
         if (!requestBody.has("feedingID")) {
             return ResponseData.badRequestBodyResponse();
         }
@@ -171,6 +180,8 @@ public class FeedingSchedulesController {
         FeedingSchedules feedingSchedules = feedingSchedulesOptional.get();
         try {
             feedingSchedulesRepository.delete(feedingSchedules);
+            // update feeding amount
+            feedingSchedulesService.updateAmount(user);
             return new ResponseData<>(200, "entity deleted", feedingSchedules);
         } catch (Exception e) {
             logger.error(e.toString());

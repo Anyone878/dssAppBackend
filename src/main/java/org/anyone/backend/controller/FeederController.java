@@ -5,6 +5,8 @@ import org.anyone.backend.model.Feeder;
 import org.anyone.backend.model.Users;
 import org.anyone.backend.repository.FeederRepository;
 import org.anyone.backend.repository.UserRepository;
+import org.anyone.backend.service.FeederService;
+import org.anyone.backend.service.FeedingSchedulesService;
 import org.anyone.backend.util.ResponseData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +25,13 @@ public class FeederController {
 
     private final UserRepository userRepository;
     private final FeederRepository feederRepository;
+    private final FeedingSchedulesService feedingSchedulesService;
     private final Logger logger = LoggerFactory.getLogger(FeederController.class);
 
-    public FeederController(UserRepository userRepository, FeederRepository feederRepository) {
+    public FeederController(UserRepository userRepository, FeederRepository feederRepository, FeedingSchedulesService feedingSchedulesService) {
         this.userRepository = userRepository;
         this.feederRepository = feederRepository;
+        this.feedingSchedulesService = feedingSchedulesService;
     }
 
     @GetMapping
@@ -73,6 +77,8 @@ public class FeederController {
             float everydayFoodPlan = Float.parseFloat(everydayFoodPlanString);
             feeder.setEverydayFoodPlan(everydayFoodPlan);
             feederRepository.save(feeder);
+            // update feeding amount
+            feedingSchedulesService.updateAmount(user);
             return new ResponseData<>(200, "feeder updated", feeder);
         } catch (NumberFormatException e) {
             logger.error(e.toString());
